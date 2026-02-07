@@ -16,8 +16,9 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dashboard-secret')
 # MongoDB connection
 mongo_client = MongoClient(os.environ.get('MONGO_URI', 'mongodb://mongodb:27017/ctf_db'))
 # MongoDB connection (duplicate, but acceptable for now)
-mongo_client = MongoClient(os.environ.get('MONGO_URI', 'mongodb://mongodb:27017/ctf_db'))
-db = mongo_client.ctf_db
+MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://mongodb:27017/ctf_db')
+mongo_client = MongoClient(MONGO_URI, connect=False)
+db = mongo_client.get_database('ctf_db')
 
 # Dashboard HTML embedded directly to avoid file serving issues
 DASHBOARD_HTML = '''<!DOCTYPE html>
