@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEBUG CONSOLE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00aaff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .console {
+            background: #000;
+            border: 1px solid #00aaff;
+            border-radius: 5px;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .title-bar {
+            background: #00aaff;
+            color: #000;
+            padding: 5px 10px;
+            margin: -20px -20px 20px -20px;
+            font-weight: bold;
+        }
+
+        .log-line {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .success {
+            color: #00ff88;
+        }
+
+        .error {
+            color: #ff6666;
+        }
+
+        .info {
+            color: #ffcc00;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="console">
+        <div class="title-bar">DEV DEBUG CONSOLE v2.1</div>
+        <div class="log-line info">[INIT] System started</div>
+        <div class="log-line success">[OK] Database connection established</div>
+        <div class="log-line success">[OK] Auth module loaded</div>
+        <div class="log-line info">[INFO] Secret endpoints: /home/pirates/packets, /secret/admin/vault</div>
+        <div class="log-line error">[WARN] Debug mode enabled - disable in production!</div>
+        <div class="log-line success">[OK] Command logging active</div>
+        <div class="log-line info">[INFO] Valid command: get_jojo</div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}My Account - SecureBank{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 4rem auto;">
+    <div class="card">
+        <h2 style="margin-bottom: 2rem; color: #00ff88;">👤 My Account</h2>
+
+        <div style="display: grid; gap: 1rem;">
+            <div style="padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                <span style="color: #00ff88; font-weight: 500;">Username:</span>
+                <span style="margin-left: 1rem;">{{ user.username }}</span>
+            </div>
+
+            <div style="padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                <span style="color: #00ff88; font-weight: 500;">Email:</span>
+                <span style="margin-left: 1rem;">{{ user.email }}</span>
+            </div>
+
+            <div style="padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                <span style="color: #00ff88; font-weight: 500;">Account Type:</span>
+                <span style="margin-left: 1rem;">{{ user.role | default('Standard') }}</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="/signout" class="btn btn-secondary">Sign Out</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<!-- username = "YnVmZmVy" password = "sWa567a6" -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureBank - Loading</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Fake nav that looks real but does nothing */
+        nav {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            cursor: default;
+        }
+
+        .nav-links span {
+            color: #666;
+            padding: 0.5rem 1rem;
+            cursor: wait;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(0, 255, 136, 0.1);
+            border-top: 4px solid #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        h2 {
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+
+        #status-text {
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+
+        .info-text {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .tech-log {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #00aaff;
+            max-width: 400px;
+            text-align: left;
+            height: 80px;
+            overflow: hidden;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            color: #333;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Fake nav that prevents clicking -->
+    <nav>
+        <span class="logo">🌐 SecureBank</span>
+        <div class="nav-links">
+            <span>Loading...</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="loader-ring"></div>
+        <h2>Connecting to Secure Servers...</h2>
+        <p id="status-text">Establishing encrypted connection</p>
+
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+
+        <p class="info-text">Please wait while we verify your credentials...</p>
+
+        <div class="tech-log" id="tech-log"></div>
+    </div>
+
+    <footer>© 2026 SecureBank. All rights reserved.</footer>
+
+    <script>
+        // Disable all keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            // Block F5, Ctrl+R, Cmd+R
+            if (e.key === 'F5' || (e.ctrlKey && e.key === 'r') || (e.metaKey && e.key === 'r')) {
+                // Allow refresh but it won't help
+            }
+            // Block Ctrl+L, Cmd+L (address bar)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+                e.preventDefault();
+            }
+        });
+
+        // Disable right-click
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        const statusMessages = [
+            "Establishing encrypted connection",
+            "Verifying SSL certificates",
+            "Authenticating session token",
+            "Loading account data",
+            "Synchronizing with database",
+            "Checking security protocols",
+            "Validating user permissions",
+            "Preparing dashboard",
+            "Almost there...",
+            "Optimizing connection",
+            "Finalizing secure handshake",
+            "Loading profile assets",
+            "Contacting backup servers...",
+            "Retrying connection...",
+            "Server response pending..."
+        ];
+
+        const techLogs = [
+            ">> Connecting to auth.securebank.net:443...",
+            ">> TLS 1.3 handshake initiated",
+            ">> Certificate chain verified",
+            ">> Session token: 7f3a9b2c...",
+            ">> Fetching user profile from DB cluster",
+            ">> Waiting for response from node-3...",
+            ">> Decrypting account data...",
+            ">> Validating 2FA status...",
+            ">> Loading transaction history...",
+            ">> Syncing with backup servers...",
+            ">> Checking fraud detection rules...",
+            ">> Preparing secure session...",
+            ">> Connection timeout, retrying...",
+            ">> Reconnecting to primary node...",
+            ">> Waiting for server response..."
+        ];
+
+        let statusIndex = 0;
+        let progress = 0;
+        let logIndex = 0;
+        const techLogEl = document.getElementById('tech-log');
+
+        setInterval(() => {
+            statusIndex = (statusIndex + 1) % statusMessages.length;
+            document.getElementById('status-text').textContent = statusMessages[statusIndex];
+        }, 3000);
+
+        setInterval(() => {
+            progress += Math.random() * 3;
+            if (progress > 85) progress = Math.random() * 20;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }, 500);
+
+        setInterval(() => {
+            const logEntry = document.createElement('div');
+            logEntry.textContent = techLogs[logIndex % techLogs.length];
+            logEntry.style.opacity = '0';
+            logEntry.style.transition = 'opacity 0.3s';
+            techLogEl.appendChild(logEntry);
+            setTimeout(() => logEntry.style.opacity = '1', 50);
+            while (techLogEl.children.length > 4) {
+                techLogEl.removeChild(techLogEl.firstChild);
+            }
+            logIndex++;
+        }, 2000);
+
+        // Intercept any navigation attempts
+        window.history.pushState(null, '', window.location.href);
+        window.addEventListener('popstate', function () {
+            window.history.pushState(null, '', window.location.href);
+        });
+    </script>
+</body>
+
+</html>

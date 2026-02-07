@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.DS_Store
+logs/
+.env
+venv/
+flask-app/logs/
+flask-app/__pycache__/
+flask-app/suricata.yaml
+flask-app/suricata.rules
+flask-app/start.sh
+flask-app/Dockerfile*
+docker-compose.yml
+google-chrome/

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACKETS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff88;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #00ff88;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        .packet-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .command-entry {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 3px solid #00ff88;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .command-entry.secret {
+            border-left-color: #ffcc00;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timestamp {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .username {
+            color: #00aaff;
+        }
+
+        .command {
+            color: #ffcc00;
+        }
+
+        .refresh-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            color: #00ff88;
+            font-size: 12px;
+        }
+
+        .blinking {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            50% {
+                opacity: 1;
+            }
+
+            51%,
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="refresh-indicator">
+        <span class="blinking">●</span> LIVE FEED
+    </div>
+
+    <div class="header">
+        <h1>📡 PACKET INTERCEPTOR</h1>
+        <p style="color: #666; margin-top: 10px;">Command Stream Monitor</p>
+    </div>
+
+    <div class="packet-container" id="packet-feed">
+        <div class="command-entry">
+            <span class="timestamp">[??:??:??]</span>
+            <span class="username">system</span>:
+            <span class="command">get_jojo</span>
+        </div>
+        <!-- Live commands will be appended here -->
+    </div>
+
+    <script>
+        let lastCommandCount = 0;
+
+        async function loadCommands() {
+            try {
+                const response = await fetch('/api/live-commands');
+                const commands = await response.json();
+
+                const container = document.getElementById('packet-feed');
+
+                // Keep the secret command at top - styled like other commands
+                let html = '<div class="command-entry"><span class="timestamp">[??:??:??]</span> <span class="username">system</span>: <span class="command">get_jojo</span></div>';
+
+                // Add all user commands
+                commands.forEach(cmd => {
+                    html += `
+                        <div class="command-entry">
+                            <span class="timestamp">[${cmd.timestamp ? new Date(cmd.timestamp).toLocaleTimeString() : '??:??'}]</span>
+                            <span class="username">${escapeHtml(cmd.username || 'unknown')}</span>: 
+                            <span class="command">${escapeHtml(cmd.command)}</span>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading commands:', error);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initial load
+        loadCommands();
+
+        // Refresh every 2 seconds
+        setInterval(loadCommands, 2000);
+    </script>
+</body>
+
+</html>
