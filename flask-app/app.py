@@ -20,8 +20,9 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # MongoDB connection
-mongo_client = MongoClient(app.config['MONGO_URI'])
-db = mongo_client.ctf_db
+# connect=False ensures connection is lazy, critical for serverless cold starts
+mongo_client = MongoClient(app.config['MONGO_URI'], connect=False)
+db = mongo_client.get_database('ctf_db')
 
 # Initialize attack logger and auth
 attack_logger = AttackLogger(db)
