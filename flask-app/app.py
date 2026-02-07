@@ -452,6 +452,13 @@ def ratelimit_handler(e):
                           error='Too many login attempts. You have been temporarily blocked. Try again in 1 minute.'), 429
 
 
+# Handle DB Connection Timeouts
+@app.errorhandler(pymongo.errors.ServerSelectionTimeoutError)
+def db_timeout_handler(e):
+    return render_template('signin.html', 
+                            error="Database Connection Failed. Please check MONGO_URI environment variable."), 503
+
+
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html'), 404
