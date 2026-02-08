@@ -11,10 +11,10 @@ dashboard_bp = Blueprint('dashboard', __name__, template_folder='templates')
 # Use same config as main app via environment or passed explicitly?
 # Vercel env vars are global.
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dashboard-secret')
+
 
 # MongoDB connection
-mongo_client = MongoClient(os.environ.get('MONGO_URI', 'mongodb://mongodb:27017/ctf_db'))
+
 # MongoDB connection (duplicate, but acceptable for now)
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://mongodb:27017/ctf_db')
 mongo_client = MongoClient(MONGO_URI, connect=False)

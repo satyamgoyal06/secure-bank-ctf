@@ -23,11 +23,7 @@ class AttackLogger:
         ]
     
     def get_client_ip(self):
-        """Get the real client IP address"""
-        if request.headers.get('X-Forwarded-For'):
-            return request.headers.get('X-Forwarded-For').split(',')[0].strip()
-        elif request.headers.get('X-Real-IP'):
-            return request.headers.get('X-Real-IP')
+        """Get the real client IP address (handled by ProxyFix)"""
         return request.remote_addr or '127.0.0.1'
     
     def detect_attack_type(self, payload):

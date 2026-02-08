@@ -35,19 +35,15 @@ app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
 # GridFS for storing files
 fs = gridfs.GridFS(db)
 
-# Custom key function to get real client IP
-def get_real_ip():
-    if request.headers.get('X-Forwarded-For'):
-        return request.headers.get('X-Forwarded-For').split(',')[0].strip()
-    elif request.headers.get('X-Real-IP'):
-        return request.headers.get('X-Real-IP')
-    return request.remote_addr or '127.0.0.1'
+# ProxyFix to handle X-Forwarded-For headers from localtunnel/proxies
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
 # Rate limiter
 limiter = Limiter(
     app=app,
-    key_func=get_real_ip,
-    default_limits=["100 per hour"]
+    key_func=get_remote_address,
+    default_limits=["200 per hour"]
 )
 
 # Login required decorator
@@ -61,6 +57,39 @@ def login_required(f):
 
 
 
+# ==================== ACCESS CONTROL ====================
+@app.before_request
+def restrict_dashboard_to_local():
+    """Ensure dashboard is only accessible from localhost"""
+    if request.path.startswith('/dashboard'):
+        # Check if the Host header is localhost or 127.0.0.1
+        request_host = request.host.split(':')[0]  # Remove port if present
+        allowed_hosts = ['localhost', '127.0.0.1']
+        
+        if request_host not in allowed_hosts:
+            return render_template('404.html'), 404  # Hide it completely with 404
+
+
+
+# Check for manually blocked IPs
+@app.before_request
+def check_blocked_ips():
+    """Check if IP is globally blocked in database"""
+    # Skip for static files to allow styling on error pages
+    if request.path.startswith('/static') or request.endpoint == 'static':
+        return
+
+    ip = request.remote_addr
+    now = datetime.utcnow()
+    
+    # Check if IP is in blocked_ips collection
+    blocked = db.blocked_ips.find_one({'ip': ip, 'blocked_until': {'$gt': now}})
+    if blocked:
+        remaining = int((blocked['blocked_until'] - now).total_seconds() / 60)
+        return render_template('signin.html', 
+                             error=f'⛔ Your IP has been banned by the administrator. Try again in {remaining} minutes.'), 403
+
+
 # Concurrent User Limiting
 @app.before_request
 def check_concurrent_users():
@@ -71,7 +100,7 @@ def check_concurrent_users():
         request.endpoint == 'static'):
         return
 
-    client_ip = get_real_ip()
+    client_ip = request.remote_addr
     now = datetime.utcnow()
     
     # Check if we already have a session
@@ -143,7 +172,7 @@ def signup():
             if attack_type:
                 attack_logger.log_request('/signup', field, attack_type)
         
-        ip = get_real_ip()
+        ip = request.remote_addr
         result = auth.signup(username, email, password, ip)
         
         if result['success']:
@@ -164,7 +193,7 @@ def signin():
         if not username or not password:
             return render_template('signin.html', error='Username and password are required')
         
-        ip = get_real_ip()
+        ip = request.remote_addr
         result = auth.signin(username, password, ip)
         
         if result['success']:
@@ -254,7 +283,7 @@ def api_command():
     """Handle command input from homepage - logs to MongoDB with rate limiting"""
     from datetime import datetime, timedelta
     
-    ip = get_real_ip()
+    ip = request.remote_addr
     now = datetime.utcnow()
     
     # Check if IP is blocked
